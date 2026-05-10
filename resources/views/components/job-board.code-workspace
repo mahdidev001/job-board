@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../../job-board"
+		},
+		{
+			"path": "../../.."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "job-board-test"
+	}
+}
