@@ -12,8 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Use raw statement to alter enum nullability to avoid requiring doctrine/dbal
-        DB::statement("ALTER TABLE `users` MODIFY `role` ENUM('user','employer') NULL DEFAULT NULL;");
+        // Only run MySQL-specific ALTER statements when using MySQL.
+        // SQLite does not support MODIFY/ENUM; skip on sqlite to avoid errors.
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE `users` MODIFY `role` ENUM('user','employer') NULL DEFAULT NULL;");
+        }
     }
 
     /**
@@ -21,6 +24,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE `users` MODIFY `role` ENUM('user','employer') NOT NULL DEFAULT 'user';");
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE `users` MODIFY `role` ENUM('user','employer') NOT NULL DEFAULT 'user';");
+        }
     }
 };
