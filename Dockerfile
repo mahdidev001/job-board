@@ -3,6 +3,7 @@ FROM node:20 AS node-build
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
+COPY vite.config.js ./
 COPY postcss.config.js tailwind.config.js ./
 COPY resources resources
 
