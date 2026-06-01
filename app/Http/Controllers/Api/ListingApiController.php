@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Listing;
-use App\Models\Tag;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListingApiController extends Controller
