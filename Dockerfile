@@ -8,6 +8,7 @@ COPY resources resources
 
 RUN npm install
 RUN npm run build
+RUN npm run build:vite
 
 
 FROM php:8.3-cli
@@ -33,7 +34,7 @@ RUN cp .env.example .env
 COPY .env.example .env
 RUN php artisan key:generate
 # Copy built frontend assets from node build stage
-COPY --from=node-build /app/public/css ./public/css
+COPY --from=node-build /app/public ./public
 
 
 # Migrations should run at container runtime, not during image build.
