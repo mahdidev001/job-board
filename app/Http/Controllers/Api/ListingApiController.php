@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Listing;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class ListingApiController extends Controller
 {
@@ -25,7 +28,12 @@ class ListingApiController extends Controller
         return response()->json($listings);
     }
 
-    public function show(Listing $listing)
+    public function __construct()
+    {
+        $this->middleware('auth')->only(['store', 'update', 'destroy']);
+    }
+
+    public function show(Listing $listing): JsonResponse
     {
         if (!$listing->is_active) {
             return response()->json(['error' => 'Listing not found'], 404);
@@ -35,7 +43,7 @@ class ListingApiController extends Controller
         return response()->json($listing);
     }
 
-    public function showDetails(Listing $listing)
+    public function showDetails(Listing $listing): JsonResponse
     {
         if (!$listing->is_active) {
             return response()->json(['error' => 'Listing not found'], 404);
@@ -45,7 +53,7 @@ class ListingApiController extends Controller
         return response()->json($listing);
     }
 
-    public function search(Request $request)
+    public function search(Request $request): JsonResponse
     {
         $search = $request->get('q', '');
         
@@ -68,7 +76,7 @@ class ListingApiController extends Controller
         return response()->json($listings);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -80,7 +88,13 @@ class ListingApiController extends Controller
             'tags.*' => 'exists:tags,id',
         ]);
 
-        $listing = auth()->user()->listings()->create([
+        $user = Auth::user();
+        /** @var User $user */
+        if (!$user) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $listing = $user->listings()->create([
             'title' => $validated['title'],
             'company' => $validated['company'],
             'location' => $validated['location'],
@@ -97,9 +111,9 @@ class ListingApiController extends Controller
         return response()->json($listing, 201);
     }
 
-    public function update(Request $request, Listing $listing)
+    public function update(Request $request, Listing $listing): JsonResponse
     {
-        if ($listing->user_id !== auth()->id()) {
+        if ($listing->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -124,9 +138,9 @@ class ListingApiController extends Controller
         return response()->json($listing);
     }
 
-    public function destroy(Listing $listing)
+    public function destroy(Listing $listing): JsonResponse
     {
-        if ($listing->user_id !== auth()->id()) {
+        if ($listing->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
