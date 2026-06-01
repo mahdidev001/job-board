@@ -6,7 +6,7 @@ COPY package.json package-lock.json* ./
 COPY postcss.config.js tailwind.config.js ./
 COPY resources resources
 
-RUN npm ci
+RUN npm install
 RUN npm run build
 
 
