@@ -21,7 +21,9 @@ RUN php artisan key:generate
 RUN touch database/database.sqlite
 
 
-RUN php artisan migrate --force
+# Migrations should run at container runtime, not during image build.
+# Removing `php artisan migrate --force` from the build to avoid
+# database-specific SQL errors (SQLite vs MySQL).
 
 EXPOSE 10000
 
