@@ -24,7 +24,10 @@ RUN touch database/database.sqlite
 # Migrations should run at container runtime, not during image build.
 # Removing `php artisan migrate --force` from the build to avoid
 # database-specific SQL errors (SQLite vs MySQL).
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 EXPOSE 10000
 
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=10000"]
+ENTRYPOINT ["./entrypoint.sh"]
