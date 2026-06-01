@@ -1,3 +1,15 @@
+FROM node:18 AS node-build
+
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+COPY postcss.config.js tailwind.config.js ./
+COPY resources resources
+
+RUN npm ci
+RUN npm run build
+
+
 FROM php:8.3-cli
 
 RUN apt-get update && apt-get install -y \
@@ -5,6 +17,8 @@ RUN apt-get update && apt-get install -y \
     git \
     libsqlite3-dev \
     sqlite3 \
+    curl \
+    gnupg \
     && docker-php-ext-install pdo pdo_sqlite bcmath
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -18,7 +32,8 @@ RUN composer install --no-dev --optimize-autoloader
 RUN cp .env.example .env
 COPY .env.example .env
 RUN php artisan key:generate
-RUN touch database/database.sqlite
+# Copy built frontend assets from node build stage
+COPY --from=node-build /app/public/css ./public/css
 
 
 # Migrations should run at container runtime, not during image build.
