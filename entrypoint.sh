@@ -14,7 +14,11 @@ fi
 
 # Run migrations and other one-time runtime tasks
 php artisan migrate --force || true
-php artisan storage:link || true
+
+# Create the storage symlink only if it does not already exist
+if [ ! -e public/storage ]; then
+  php artisan storage:link
+fi
 
 # Execute the container CMD
 exec "$@"
