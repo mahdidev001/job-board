@@ -4,11 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Listing;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 
 class ListingApiController extends Controller
 {
@@ -88,8 +86,7 @@ class ListingApiController extends Controller
             'tags.*' => 'exists:tags,id',
         ]);
 
-        $user = Auth::user();
-        /** @var User $user */
+        $user = auth()->user();
         if (!$user) {
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
@@ -113,7 +110,7 @@ class ListingApiController extends Controller
 
     public function update(Request $request, Listing $listing): JsonResponse
     {
-        if ($listing->user_id !== Auth::id()) {
+        if ($listing->user_id !== auth()->id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -140,7 +137,7 @@ class ListingApiController extends Controller
 
     public function destroy(Listing $listing): JsonResponse
     {
-        if ($listing->user_id !== Auth::id()) {
+        if ($listing->user_id !== auth()->id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
